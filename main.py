@@ -1,11 +1,14 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import numpy as np
 
-
-# Initialize FastAPI app
 app = FastAPI()
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Load the pre-trained model and tokenizer
 num_classes = 4
@@ -29,3 +32,8 @@ async def predict_text(text_input: TextInput):
     y_predicted = np.argmax(output.logits.detach().numpy(), axis=1)
     predicted_label = dictionary_labels[y_predicted[0]]
     return {"prediction": predicted_label}
+
+# Serve index.html
+@app.get("/", response_class=FileResponse)
+async def get_index():
+    return FileResponse("static/index.html")

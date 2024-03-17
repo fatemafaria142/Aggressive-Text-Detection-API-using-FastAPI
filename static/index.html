@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggressive Text Detection App</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+</head>
+<body>
+    <h1>AggressiveTracker</h1>
+    <form id="text-form">
+        <label for="text-input">Enter your text here</label><br>
+        <textarea id="text-input" name="text" rows="4" cols="10"></textarea><br>
+        <button type="submit">Submit</button>
+    </form>
+    <!--  An empty <div> element where the prediction result will be displayed. -->
+    <div id="prediction-result"></div> 
+
+    <!-- JavaScript code to handle form submission and update the prediction result dynamically. -->
+    <script>
+       
+        const form = document.getElementById('text-form'); //Retrieves the form element by its id.
+        form.addEventListener('submit', async (event) => { //Adds an event listener to the form submission event.
+            event.preventDefault(); //Prevents the default form submission behavior.
+            const formData = new FormData(form); //Creates a new FormData object from the form data.
+            const text = formData.get('text'); //Retrieves the text input value from the form data.
+
+           //Sends a POST request to the '/predict/' endpoint with the user's text data.
+            const response = await fetch('/predict/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({text: text})
+            });
+
+            const data = await response.json(); //Parses the JSON response from the server.
+            document.getElementById('prediction-result').innerText = `Prediction: ${data.prediction}`; //Updates the content of the <div> element with the prediction result returned by the server.
+        });
+    </script>
+</body>
+</html>
